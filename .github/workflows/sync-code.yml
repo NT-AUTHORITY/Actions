@@ -1,9 +1,9 @@
 name: Daily Sync Workflow File
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   sync:
@@ -18,7 +18,20 @@ jobs:
         mkdir -p .github/workflows
         curl -L https://raw.githubusercontent.com/NT-AUTHORITY/Spigot-Build-Automated/refs/heads/main/.github/workflows/build-spigot.yml -o .github/workflows/build-spigot.yml
 
-    - name: Commit and push changes
+    - name: Compare file hashes
+      id: hash-check
+      run: |
+        if [ -f ".github/workflows/build-spigot.yml" ]; then
+          current_hash=$(sha256sum .github/workflows/build-spigot.yml | awk '{print $1}')
+        else
+          current_hash=""
+        fi
+        new_hash=$(sha256sum .github/workflows/build-spigot.yml | awk '{print $1}')
+        echo "current_hash=$current_hash" >> $GITHUB_ENV
+        echo "new_hash=$new_hash" >> $GITHUB_ENV
+
+    - name: Commit and push changes if needed
+      if: env.current_hash != env.new_hash
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
