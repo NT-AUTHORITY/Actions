@@ -13,28 +13,15 @@ jobs:
     - name: Checkout current repository
       uses: actions/checkout@v3
 
-    - name: Download workflow file
+    - name: Download workflow file (Force Sync)
       run: |
         mkdir -p .github/workflows
         curl -L https://raw.githubusercontent.com/NT-AUTHORITY/Spigot-Build-Automated/refs/heads/main/.github/workflows/build-spigot.yml -o .github/workflows/build-spigot.yml
 
-    - name: Compare file hashes
-      id: hash-check
-      run: |
-        if [ -f ".github/workflows/build-spigot.yml" ]; then
-          current_hash=$(sha256sum .github/workflows/build-spigot.yml | awk '{print $1}')
-        else
-          current_hash=""
-        fi
-        new_hash=$(sha256sum .github/workflows/build-spigot.yml | awk '{print $1}')
-        echo "current_hash=$current_hash" >> $GITHUB_ENV
-        echo "new_hash=$new_hash" >> $GITHUB_ENV
-
-    - name: Commit and push changes if needed
-      if: env.current_hash != env.new_hash
+    - name: Commit and push changes
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add .github/workflows/build-spigot.yml
-        git commit -m "Daily update of build-spigot.yml from Spigot-Build-Automated"
-        git push
+        git commit -m "Forced sync of build-spigot.yml from Spigot-Build-Automated"
+        git push -f
