@@ -15,7 +15,7 @@ jobs:
 
     - name: Download workflow file (Force Sync)
       run: |
-        mkdir -p .github/workflows
+        mkdir -p /src
         curl -L https://raw.githubusercontent.com/NT-AUTHORITY/Spigot-Build-Automated/refs/heads/main/.github/workflows/build-spigot.yml -o .github/workflows/build-spigot.yml
 
     - name: Commit and push changes
